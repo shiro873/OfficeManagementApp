@@ -7,6 +7,28 @@ const EmployeeHome = ({ navigation }) => {
     const [exitTime, setExitTime] = useState(null);
     const [reviewMessage, setReviewMessage] = useState('');
 
+    const [remainingLeave, setRemainingLeave] = useState(null); // Placeholder for remaining leave
+
+    const fetchLeaveBalance = async () => {
+        try {
+            const response = await axios.get('https://your-api.com/api/employee/leave-balance');
+
+            if (response.data.success) {
+                setRemainingLeave(response.data.balance); // Assuming API response structure for leave balance
+                console.log('Leave balance fetched:', response.data);
+            } else {
+                alert('Failed to fetch leave balance. Please check the API response for details.');
+            }
+        } catch (error) {
+            console.error('Error fetching leave balance:', error);
+            alert('Failed to fetch leave balance. Please check your network connection and try again.');
+        }
+    };
+
+    useEffect(() => {
+        fetchLeaveBalance();
+    }, []);
+
     const handleEntryTime = async () => {
         try {
             const response = await axios.post('https://officemanagement.pdjohn.me/api/user/user_entry_time', {
@@ -97,6 +119,12 @@ const EmployeeHome = ({ navigation }) => {
                 <Button title="Request Review" onPress={handleReviewRequest} />
             )}
             <Button title="View Attendance" onPress={() => navigation.navigate('Attendance')} />
+            <Button title="Leave Requests" onPress={() => navigation.navigate('LeaveRequestList')} />
+            <Button title="Overtime Requests" onPress={() => navigation.navigate('Overtime')} />
+            <Button title="Official Leaves" onPress={() => navigation.navigate('OfficialLeave')} />
+            {remainingLeave !== null && (
+                <Text>Remaining Leave Balance: {remainingLeave}</Text>
+            )}
         </View>
     );
 };
